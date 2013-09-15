@@ -31,7 +31,6 @@ public class ProxyServer {
 
     private Server server;
     private int port = -1;
-    private InetAddress localHost;
     private BrowserMobHttpClient client;
     private StreamManager streamManager;
     private HarPage currentPage;
@@ -56,7 +55,7 @@ public class ProxyServer {
         streamManager = new StreamManager( 100 * BandwidthLimiter.OneMbps );
 
         server = new Server();
-        HttpListener listener = new SocketListener(new InetAddrPort(getLocalHost(), getPort()));
+        HttpListener listener = new SocketListener(new InetAddrPort(getPort()));
         server.addListener(listener);
         HttpContext context = new HttpContext();
         context.setContextPath("/");
@@ -77,9 +76,17 @@ public class ProxyServer {
     }
 
     public org.openqa.selenium.Proxy seleniumProxy() throws UnknownHostException {
+        return seleniumProxy(InetAddress.getLocalHost());
+    }
+
+    public org.openqa.selenium.Proxy seleniumProxy(InetAddress localHost) throws UnknownHostException {
+        if (!localHost.isAnyLocalAddress()) {
+            throw new IllegalArgumentException("Must be address of a local adapter");
+        }
+
         Proxy proxy = new Proxy();
         proxy.setProxyType(Proxy.ProxyType.MANUAL);
-        String proxyStr = String.format("%s:%d", getLocalHost().getCanonicalHostName(), getPort());
+        String proxyStr = String.format("%s:%d", localHost.getCanonicalHostName(),  getPort());
         proxy.setHttpProxy(proxyStr);
         proxy.setSslProxy(proxyStr);
 
@@ -102,20 +109,6 @@ public class ProxyServer {
 
     public void setPort(int port) {
         this.port = port;
-    }
-
-    public InetAddress getLocalHost() throws UnknownHostException {
-        if (localHost == null) {
-            localHost = InetAddress.getLocalHost();
-        }
-        return localHost;
-    }
-
-    public void setLocalHost(InetAddress localHost) {
-        if (!localHost.isAnyLocalAddress()) {
-            throw new IllegalArgumentException("Must be address of a local adapter");
-        }
-        this.localHost = localHost;
     }
 
     public Har getHar() {
