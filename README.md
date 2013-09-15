@@ -167,6 +167,13 @@ You can use the REST API with Selenium however you want. But if you're writing y
     // get the HAR data
     Har har = server.getHar();
 
+If your web browsers are remote, you can specify a specific IP address for them to connect to:
+
+    proxyServer = new ProxyServer(proxyPort);
+
+    // Connect to proxy via Juniper VPN interface
+    NetworkInterface vpn = NetworkInterface.getByName("jnc0");
+    Proxy proxy = server.seleniumProxy(vpn.getInetAddresses().nextElement());
 
 HTTP Request Manipulation
 -------------------
