@@ -167,7 +167,7 @@ You can use the REST API with Selenium however you want. But if you're writing y
     // get the HAR data
     Har har = server.getHar();
 
-If your web browsers are remote, you can specify a specific IP address for them to connect to:
+If your web browsers are remote, you can specify an IP address for them to connect to:
 
     proxyServer = new ProxyServer(proxyPort);
 
