@@ -725,7 +725,6 @@ public class BrowserMobHttpClient {
                 if (contentTypeHdr != null) {
                     contentType = contentTypeHdr.getValue();
                     entry.getResponse().getContent().setMimeType(contentType);
-
                     if (captureContent && os != null && os instanceof ClonedOutputStream) {
                         ByteArrayOutputStream copy = ((ClonedOutputStream) os).getOutput();
 
@@ -746,7 +745,14 @@ public class BrowserMobHttpClient {
                         		contentType.startsWith("application/json")  ||
                         		contentType.startsWith("application/xml")  ||
                         		contentType.startsWith("application/xhtml+xml")) {
-                            entry.getResponse().getContent().setText(new String(copy.toByteArray()));
+                            String encodingString = "UTF-8";
+                            String ct = contentType.toLowerCase();
+                            if (ct.contains("charset=")) {
+                                if (!(ct.contains("utf-8") || ct.contains("utf8"))) {
+                                    encodingString = "GB18030";
+                                }
+                            }
+                            entry.getResponse().getContent().setText(new String(copy.toByteArray(), encodingString));
                         } else if(captureBinaryContent){
                             entry.getResponse().getContent().setText(Base64.byteArrayToBase64(copy.toByteArray()));
                         }
